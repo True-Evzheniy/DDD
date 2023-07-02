@@ -1,3 +1,8 @@
+const Transport = {
+    http: './http.js',
+    ws: './ws.js',
+};
+
 module.exports = {
     staticServerPort: 8000,
     apiServerPort: 8001,
@@ -13,4 +18,5 @@ module.exports = {
         keyLenght: 64,
         encoding: 'base64',
     },
+    transport: Transport.ws,
 };
