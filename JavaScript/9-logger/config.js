@@ -18,5 +18,5 @@ module.exports = {
         keyLenght: 64,
         encoding: 'base64',
     },
-    transport: Transport.ws,
+    transport: Transport.http,
 };
