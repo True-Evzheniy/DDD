@@ -12,6 +12,7 @@ const receiveArgs = async (req) => {
 module.exports = (routing, port) => {
   http.createServer(async (req, res) => {
     const { url, socket } = req;
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const [name, method, id] = url.substring(1).split('/');
     const entity = routing[name];
     if (!entity) return res.end('Not found');
@@ -21,7 +22,7 @@ module.exports = (routing, port) => {
     const signature = src.substring(0, src.indexOf(')'));
     const args = [];
     if (signature.includes('(id')) args.push(id);
-    if (signature.includes('{')) args.push(await receiveArgs(req));
+    if (signature.match(/\{|\(mask/)) args.push(await receiveArgs(req));
     console.log(`${socket.remoteAddress} ${method} ${url}`);
     const result = await handler(...args);
     res.end(JSON.stringify(result.rows));

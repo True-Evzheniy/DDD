@@ -1,8 +1,8 @@
 'use strict';
+const transport = {};
 
-const socket = new WebSocket('ws://127.0.0.1:8001/');
-
-const scaffold = (structure) => {
+transport.ws = (url, structure) => {
+  const socket = new WebSocket(url);
   const api = {};
   const services = Object.keys(structure);
   for (const serviceName of services) {
@@ -23,7 +23,29 @@ const scaffold = (structure) => {
   return api;
 };
 
-const api = scaffold({
+transport.http = (url, structure) => {
+  const api = {};
+  const services = Object.keys(structure);
+  for (const serviceName of services) {
+    api[serviceName] = {};
+    const service = structure[serviceName];
+    const methods = Object.keys(service);
+    for (const methodName of methods) {
+      api[serviceName][methodName] = async (...args) => {
+        const idSlug = (service[methodName][0] === 'id' && args.length) ? `/${args.shift()}` : '';
+        const methodUrl = `${url}/${serviceName}/${methodName}${idSlug}`;
+        const bodyArgument = args.shift();
+        const body = bodyArgument && JSON.stringify(bodyArgument);
+        const method = body ? 'POST' : 'GET';
+
+        return (await fetch(methodUrl, {body, method})).json();
+      }
+    }
+  }
+  return api;
+};
+
+const structure = {
   user: {
     create: ['record'],
     read: ['id'],
@@ -36,9 +58,12 @@ const api = scaffold({
     delete: ['id'],
     find: ['mask'],
   },
-});
+};
 
-socket.addEventListener('open', async () => {
-  const data = await api.user.read(3);
-  console.dir({ data });
-});
+const scaffold = (url, structure) => {
+  const protocol = url.includes('ws') ? 'ws' : 'http';
+
+  return transport[protocol](url, structure);
+}
+
+const api = scaffold(apiUrl, structure);
