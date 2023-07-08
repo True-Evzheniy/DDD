@@ -1,11 +1,19 @@
+'use strict';
+
 const Transport = {
-    http: './http.js',
-    ws: './ws.js',
+    http: 'http',
+    ws: 'ws',
 };
 
 module.exports = {
-    staticServerPort: 8000,
-    apiServerPort: 8001,
+    api: {
+        port: 8001,
+        host: '127.0.0.1',
+        transport: Transport.http,
+    },
+    static: {
+        port: 8000,
+    },
     db: {
         host: '127.0.0.1',
         port: 5432,
@@ -18,5 +26,4 @@ module.exports = {
         keyLenght: 64,
         encoding: 'base64',
     },
-    transport: Transport.http,
 };
