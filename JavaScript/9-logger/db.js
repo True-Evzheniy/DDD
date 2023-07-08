@@ -3,11 +3,7 @@
 const pg = require('pg');
 const {db: config} = require('./config.js');
 
-const pool = new pg.Pool({
-  ...config
-});
-
-module.exports = (table) => ({
+const crud  = (pool) => (table) => ({
   query(sql, args) {
     return pool.query(sql, args);
   },
@@ -54,3 +50,5 @@ module.exports = (table) => ({
     return pool.query(sql, [id]);
   },
 });
+
+module.exports = (options) =>  crud(new pg.Pool(options));
